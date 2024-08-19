@@ -1,0 +1,39 @@
+---
+argument_specs:
+  main:
+    short_description: create a non root sudo user
+    options:
+      disable_root_password:
+        type: "bool"
+        description: whether the root password should be disabled
+        required: true
+      user_name:
+        type: "str"
+        description: username of the new sudo user
+        required: true
+      sudo_group_name:
+        type: "str"
+        description: name to be used for the sudoers group, defaults to 'wheel'
+        required: true
+      authorized_keys:
+        type: "str"
+        description: multiline, exactly like file content is expected to be
+        required: true
+      user_password:
+        type: "str"
+        description: >
+          in plaintext, will be hashed appropriately,
+          otherwise disabled if omitted
+        required: false
+      root_password:
+        type: "str"
+        description: >
+          in plaintext, will be hashed appropriately,
+          is ignored if disable_root is true
+        required: false
+      passwordless_sudo:
+        type: "bool"
+        description: >
+          whether the sudo command can be run
+          without a password prompt
+        required: true

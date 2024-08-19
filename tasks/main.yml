@@ -1,0 +1,93 @@
+---
+
+- name: check for supported distro
+  fail: "{{ ansible_distribution }} is unsupported. Only Debian and Ubuntu."
+  when: ansible_distribution != 'Debian' and ansible_distribution != 'Ubuntu'
+
+- name: install sudo package
+  apt:
+    name: sudo
+    state: present
+
+- name: create sudoers group '{{ sudo_group_name }}'
+  group:
+    name: "{{ sudo_group_name }}"
+    state: present
+
+- name: allow '{{ sudo_group_name }}' group sudo access
+  when: not passwordless_sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%{{ sudo_group_name }}'
+    line: '%{{ sudo_group_name }} ALL=(ALL:ALL) ALL'
+    validate: 'visudo -cf %s'
+
+- name: allow '{{ sudo_group_name }}' group passwordless sudo access
+  when: passwordless_sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%{{ sudo_group_name }}'
+    line: '%{{ sudo_group_name }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: create user '{{ user_name }}'
+  user:
+    name: "{{ user_name }}"
+    groups: "{{ sudo_group_name }}"
+    shell: '/bin/bash'
+    password: >
+      "{{ '*' if user_password is not defined
+      else (user_password | password_hash('sha512'))
+      }}"
+    update_password: on_create
+    append: true
+    state: present
+    createhome: true
+  no_log: true
+
+- name: add '{{ user_name }}' to '{{ sudo_group_name }}' group
+  when: user_name is defined and sudo_group_name is defined
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: "{{ sudo_group_name }}"
+    append: true
+
+- name: set authorized keys for new user
+  when: authorized_keys is defined
+  ansible.posix.authorized_key:
+    user: "{{ user_name }}"
+    state: present
+    key: "{{ authorized_keys }}"
+
+# - name: Update for user .bashrc
+#   when: user_name is defined
+#   copy:
+#     src: files/.bashrc
+#     dest: /home/{{ user_name }}/.bashrc
+#     owner: "{{ user_name }}"
+#     group: "{{ user_name }}"
+#     mode: 0644
+
+- name: create .hushlogin for '{{ user_name }}' (suppress ssh motd)
+  when: user_name is defined
+  copy:
+    content: ""
+    dest: /home/{{ user_name }}/.hushlogin
+    force: false
+    group: "{{ user_name }}"
+    owner: "{{ user_name }}"
+    mode: 0644
+
+- name: update root password
+  when: not disable_root and root_password is defined
+  user:
+    name: root
+    password: "{{ root_password | password_hash('sha512') }}"
+
+- name: disable root login
+  when: disable_root
+  user:
+    name: root
+    password: "*"
