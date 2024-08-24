@@ -13,8 +13,9 @@ argument_specs:
         required: true
       sudo_group_name:
         type: "str"
-        description: name to be used for the sudoers group, defaults to 'wheel'
+        description: name to be used for the sudoers group
         required: true
+        default: wheel
       authorized_keys:
         type: "str"
         description: multiline, exactly like file content is expected to be
