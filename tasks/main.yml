@@ -1,39 +1,39 @@
 ---
 
-- name: check for supported distro
-  fail: "{{ ansible_distribution }} is unsupported. Only Debian and Ubuntu."
+- name: Check for supported distro
   when: ansible_distribution != 'Debian' and ansible_distribution != 'Ubuntu'
+  ansible.builtin.fail: "{{ ansible_distribution }} is unsupported. Only Debian and Ubuntu."
 
-- name: install sudo package
-  apt:
+- name: Install sudo package
+  ansible.builtin.apt:
     name: sudo
     state: present
 
-- name: create sudoers group '{{ sudo_group_name }}'
-  group:
+- name: Create sudoers group '{{ sudo_group_name }}'
+  ansible.builtin.group:
     name: "{{ sudo_group_name }}"
     state: present
 
-- name: allow '{{ sudo_group_name }}' group sudo access
+- name: Allow sudo access for sudoers group
   when: not passwordless_sudo
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: '^%{{ sudo_group_name }}'
     line: '%{{ sudo_group_name }} ALL=(ALL:ALL) ALL'
     validate: 'visudo -cf %s'
 
-- name: allow '{{ sudo_group_name }}' group passwordless sudo access
+- name: Allow passwordless sudo access for sudoers group
   when: passwordless_sudo
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: '^%{{ sudo_group_name }}'
     line: '%{{ sudo_group_name }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-- name: create user '{{ user_name }}'
-  user:
+- name: Create user '{{ user_name }}'
+  ansible.builtin.user:
     name: "{{ user_name }}"
     groups: "{{ sudo_group_name }}"
     shell: '/bin/bash'
@@ -47,14 +47,14 @@
     createhome: true
   no_log: true
 
-- name: add '{{ user_name }}' to '{{ sudo_group_name }}' group
+- name: Add to sudoers group
   when: user_name is defined and sudo_group_name is defined
   ansible.builtin.user:
     name: "{{ user_name }}"
     groups: "{{ sudo_group_name }}"
     append: true
 
-- name: set authorized keys for new user
+- name: Set authorized keys for new user
   when: authorized_keys is defined
   ansible.posix.authorized_key:
     user: "{{ user_name }}"
@@ -70,24 +70,24 @@
 #     group: "{{ user_name }}"
 #     mode: 0644
 
-- name: create .hushlogin for '{{ user_name }}' (suppress ssh motd)
+- name: Create .hushlogin for user (suppress ssh motd)
   when: user_name is defined
-  copy:
+  ansible.builtin.copy:
     content: ""
     dest: /home/{{ user_name }}/.hushlogin
     force: false
     group: "{{ user_name }}"
     owner: "{{ user_name }}"
-    mode: 0644
+    mode: "0644"
 
-- name: update root password
+- name: Update root password
   when: not disable_root and root_password is defined
-  user:
+  ansible.builtin.user:
     name: root
     password: "{{ root_password | password_hash('sha512') }}"
 
-- name: disable root login
+- name: Disable root login
   when: disable_root
-  user:
+  ansible.builtin.user:
     name: root
     password: "*"
