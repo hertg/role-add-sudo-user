@@ -21,8 +21,8 @@ jobs:
 
       - name: Install ansible-lint
         run: |
-          sudo apt update
-          sudo apt install ansible-lint
+          apt update
+          apt install ansible-lint
 
       - name: Run ansible-lint
         run: ansible-lint .
