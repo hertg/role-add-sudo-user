@@ -1,6 +1,5 @@
 ---
 dependencies: []
-
 galaxy_info:
   author: hertg
   role_name: add_sudo_user

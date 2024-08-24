@@ -1,7 +1,9 @@
 ---
+
 argument_specs:
   main:
-    short_description: create a non root sudo user
+    short_description: Add a new user with sudo privileges
+    author: hertg
     options:
       disable_root_password:
         type: "bool"
