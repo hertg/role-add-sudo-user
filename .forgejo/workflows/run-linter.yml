@@ -18,3 +18,11 @@ jobs:
         uses: https://code.forgejo.org/ansible-actions/yamllint-action@v0.0.2
         with:
           target: "./"
+
+      - name: Install ansible-lint
+        run: |
+          sudo apt update
+          sudo apt install ansible-lint
+
+      - name: Run ansible-lint
+        run: ansible-lint .
