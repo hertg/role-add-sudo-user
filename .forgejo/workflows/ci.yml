@@ -11,7 +11,7 @@ name: CI
 
 jobs:
 
-  yaml-lint:git@codeberg.org:hertg/role-add-sudo-user.git
+  yaml-lint:
     name: Run YAML Lint
     uses: ./.forgejo/workflows/run-yaml-lint.yml
     runs-on: selfhosted
