@@ -82,13 +82,13 @@
     mode: "0644"
 
 - name: Update root password
-  when: not disable_root and root_password is defined
+  when: not disable_root_password and root_password is defined
   ansible.builtin.user:
     name: root
     password: "{{ root_password | password_hash('sha512') }}"
 
 - name: Disable root login
-  when: disable_root
+  when: disable_root_password
   ansible.builtin.user:
     name: root
     password: "*"
