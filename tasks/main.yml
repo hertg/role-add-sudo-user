@@ -38,10 +38,10 @@
     name: "{{ user_name }}"
     groups: "{{ sudo_group_name }}"
     shell: '/bin/bash'
-    password: >
-      "{{ '*' if user_password is not defined
+    password: >-
+      {{ '*' if user_password is not defined
       else (user_password | password_hash('sha512'))
-      }}"
+      }}
     update_password: on_create
     append: true
     state: present

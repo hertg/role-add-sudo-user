@@ -1,4 +1,4 @@
-# role-add-sudo-user
+# hertg.add_sudo_user
 
 Ansible Galaxy role to create a custom sudo user on Debian.
 
