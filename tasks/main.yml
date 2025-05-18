@@ -1,9 +1,13 @@
 ---
 
 - name: Check for supported distro
-  when: ansible_distribution != 'Debian' and ansible_distribution != 'Ubuntu' and ansible_distribution != 'Alpine'
-  ansible.builtin.fail: >
-    "{{ ansible_distribution }} is unsupported. Only Debian, Ubuntu, and Alpine."
+  when: >-
+    ansible_distribution != 'Debian' and
+    ansible_distribution != 'Ubuntu' and
+    ansible_distribution != 'Alpine'
+  ansible.builtin.fail: >-
+    "{{ ansible_distribution }} is unsupported.
+    Only Debian, Ubuntu, and Alpine."
 
 - name: Install sudo package
   ansible.builtin.package:
