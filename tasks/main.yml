@@ -37,7 +37,7 @@
   ansible.builtin.user:
     name: "{{ user_name }}"
     groups: "{{ sudo_group_name }}"
-    shell: '/bin/bash'
+    shell: "{{ shell }}"
     password: >-
       {{ '*' if user_password is not defined
       else (user_password | password_hash('sha512'))
